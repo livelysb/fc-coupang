@@ -7,7 +7,6 @@ import AlertDto from "./global-components/AlertDto";
 
 
 export default function TodayPlayer() {
-    const baseUrl = "http://kev-home.iptime.org:8080";
     const [players, setPlayers] = useState(null);
     const [selected, setSelected] = useState([]);
     const [backdrop, setBackdrop] = useState(false);
@@ -20,7 +19,7 @@ export default function TodayPlayer() {
 
     async function getTodayPlayers() {
         await axios
-            .get(baseUrl + "/today-players")
+            .get("/api/today-players")
             .then((response) => {
                 if (response.data.success) {
                     setSelected(response.data.body.map((player) => {
@@ -34,7 +33,7 @@ export default function TodayPlayer() {
 
     async function getAllPlayers() {
         await axios
-            .get(baseUrl + "/all-players")
+            .get("/api/all-players")
             .then((response) => {
                 if (response.data.success) {
                     setPlayers(response.data.body)
@@ -47,7 +46,7 @@ export default function TodayPlayer() {
     async function putTodayPlayer() {
         setBackdrop(true)
         await axios
-            .post(baseUrl + "/today-players", selected)
+            .post("/api/today-players", selected)
             .then((response) => {
                 setBackdrop(false)
                 if (response.data.success) {

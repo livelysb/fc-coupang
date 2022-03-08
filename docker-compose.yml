@@ -1,0 +1,24 @@
+version: "3"
+services:
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "80:80"
+  fc-coupang-web:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    stdin_open: true
+  fc-coupang:
+    build:
+      dockerfile: Dockerfile
+    environment:
+      - "PROFILE=${PROFILE}"
+      - "DB_USER_NAME=${DB_USER_NAME}"
+      - "DB_USER_PASSWORD=${DB_USER_PASSWORD}"

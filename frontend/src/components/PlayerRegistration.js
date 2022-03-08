@@ -6,7 +6,6 @@ import CustomizedSnackbar from "./global-components/CustomizedSnackBar";
 import AlertDto from "./global-components/AlertDto";
 
 export default function PlayerRegistration() {
-    const baseUrl = "http://kev-home.iptime.org:8080";
     const [name, setName] = useState("");
     const [nickname, setNickname] = useState("");
     const [backdrop, setBackdrop] = useState(false);
@@ -24,7 +23,7 @@ export default function PlayerRegistration() {
         e.preventDefault()
         setBackdrop(true)
         await axios
-            .post(baseUrl + "/player", {
+            .post("/api/player", {
                     name: name.trim(),
                     nickname: nickname.trim()
                 }

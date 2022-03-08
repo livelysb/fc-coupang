@@ -37,7 +37,6 @@ const Item = styled(Paper)(({theme}) => ({
 export default function MatchDashboard() {
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams();
-    const baseUrl = "http://kev-home.iptime.org:8080";
     const [scoreRecord, setScoreRecord] = useState(false)
     const [goalPlayerId, setGoalPlayerId] = useState('')
     const [assistPlayerId, setAssistPlayerId] = useState('')
@@ -57,7 +56,7 @@ export default function MatchDashboard() {
 
     async function getMatch(matchId) {
         await axios
-            .get(baseUrl + "/match?matchId=" + matchId)
+            .get("/api/match?matchId=" + matchId)
             .then((response) => {
                 if (response.data.success) {
                     let match = response.data.body;
@@ -124,7 +123,7 @@ export default function MatchDashboard() {
 
     async function handleGoalBtn() {
         await axios
-            .post(baseUrl + "/goal", {
+            .post("/api/goal", {
                 matchId: searchParams.get("matchId"),
                 goalPlayerId: goalPlayerId,
                 assistPlayerId: assistPlayerId
@@ -154,7 +153,7 @@ export default function MatchDashboard() {
 
     async function handleEndMatchBtn() {
         await axios
-            .post(baseUrl + "/match/end?matchId=" + searchParams.get("matchId"))
+            .post("/api/match/end?matchId=" + searchParams.get("matchId"))
             .then((response) => {
                 if (response.data.success) {
                     navigate("/match", {replace: true})
@@ -166,7 +165,7 @@ export default function MatchDashboard() {
 
     async function handleCancelMatchBtn() {
         await axios
-            .post(baseUrl + "/match/cancel?matchId=" + searchParams.get("matchId"))
+            .post( "/api/match/cancel?matchId=" + searchParams.get("matchId"))
             .then((response) => {
                 if (response.data.success) {
                     navigate("/match", {replace: true})

@@ -28,7 +28,6 @@ class PlayerDto {
 
 export default function TeamBuilding() {
 
-    const baseUrl = "http://kev-home.iptime.org:8080";
     const [players, setPlayers] = React.useState(new Map());
     const [alertDto, setAlertDto] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
@@ -36,7 +35,7 @@ export default function TeamBuilding() {
 
     async function getTodayPlayers() {
         await axios
-            .get(baseUrl + "/today-players")
+            .get("/api/today-players")
             .then((response) => {
                 if (response.data.success) {
                     const playerList = response.data.body.map((player) => new PlayerDto(player.playerId, player.name + " / " + player.nickname, ''))
@@ -59,7 +58,7 @@ export default function TeamBuilding() {
 
     async function startMatch() {
         await axios
-            .post(baseUrl + "/match", {
+            .post("/api/match", {
                 playerList: Array.from(players).filter(([, value]) => value.team !== '').map(([, player]) => {
                     return {
                         playerId: player.playerId,
