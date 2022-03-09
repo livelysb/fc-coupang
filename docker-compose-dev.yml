@@ -1,5 +1,14 @@
 version: "3"
 services:
+  redis:
+    image: redis
+  mysql:
+    image: mysql
+    environment:
+      - "MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
+      - "MYSQL_USER=${DB_USER_NAME}"
+      - "MYSQL_PASSWORD=${DB_USER_PASSWORD}"
+      - "MYSQL_DATABASE=fc_coupang"
   nginx:
     restart: always
     build:
@@ -7,7 +16,7 @@ services:
       context: ./nginx
     ports:
       - "80:80"
-  fc-coupang-web:
+  web:
     build:
       dockerfile: Dockerfile
       context: ./frontend
@@ -15,10 +24,10 @@ services:
       - /app/node_modules
       - ./frontend:/app
     stdin_open: true
-  fc-coupang:
+  app:
     build:
       dockerfile: Dockerfile
     environment:
-      - "PROFILE=${PROFILE}"
+      - "PROFILE=develop"
       - "DB_USER_NAME=${DB_USER_NAME}"
       - "DB_USER_PASSWORD=${DB_USER_PASSWORD}"
