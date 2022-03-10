@@ -10,7 +10,6 @@ services:
       - "MYSQL_PASSWORD=${DB_USER_PASSWORD}"
       - "MYSQL_DATABASE=fc_coupang"
   nginx:
-    restart: always
     build:
       dockerfile: Dockerfile
       context: ./nginx

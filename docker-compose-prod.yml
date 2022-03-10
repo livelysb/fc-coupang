@@ -1,0 +1,19 @@
+version: "3"
+services:
+  nginx:
+    image: livelysb/fc-coupang_nginx
+    restart: always
+    ports:
+      - "80:80"
+  web:
+    image: livelysb/fc-coupang_web
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    stdin_open: true
+  app:
+    image: livelysb/fc-coupang_app
+    environment:
+      - "PROFILE=production"
+      - "DB_USER_NAME=${DB_USER_NAME}"
+      - "DB_USER_PASSWORD=${DB_USER_PASSWORD}"
