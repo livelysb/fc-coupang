@@ -80,7 +80,7 @@ export default function MatchHistory() {
                                 }) : null
                         }
                         {
-                            matches && matches.length % 5 === 0 ?
+                            matches.length > 0 && matches.length % 5 === 0 ?
                                 <TableRow><TableCell align={'center'} colSpan={4}><Button variant="text"
                                                                                           onClick={getRecentMatches}>더보기</Button></TableCell></TableRow>
                                 : null
