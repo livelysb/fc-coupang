@@ -41,4 +41,9 @@ class MatchService(
             delete()
         } ?: throw ExpectedCaseException("경기가 존재하지 않습니다.")
     }
+
+    @Transactional(readOnly = true)
+    fun getRecentMatches(lastMatchId: Long = Long.MAX_VALUE) =
+        matchRepository.findTop5ByMatchIdLessThanOrderByMatchIdDesc(lastMatchId).map { it.toDto() }
+
 }

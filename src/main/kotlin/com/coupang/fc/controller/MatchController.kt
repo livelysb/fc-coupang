@@ -32,4 +32,8 @@ class MatchController(
     @PostMapping("/match/cancel")
     fun cancelMatch(matchId: Long) = ApiResponse.run { matchService.cancelMatch(matchId) }
 
+    @GetMapping("/matches/recent")
+    fun getRecentMatches(lastMatchId: Long?) =
+        ApiResponse.run { matchService.getRecentMatches(lastMatchId ?: Long.MAX_VALUE) }
+
 }
