@@ -1,6 +1,8 @@
 # FC Coupang Match History
 FC쿠팡 축구경기 기록 관리 ( 모바일 웹 환경 )
 
+베타버전링크 : http://ec2-3-38-185-67.ap-northeast-2.compute.amazonaws.com
+
 ## Tech Stack
 
 Frontend: React
