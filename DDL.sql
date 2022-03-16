@@ -1,5 +1,5 @@
-DROP TABLE `player`;
-CREATE TABLE `player`
+DROP TABLE IF EXISTS `fc_coupang`.`player`;
+CREATE TABLE `fc_coupang`.`player`
 (
     `playerId`  BIGINT NOT NULL AUTO_INCREMENT,
     `name`      VARCHAR(30) NOT NULL,
@@ -15,8 +15,8 @@ CREATE TABLE `player`
     PRIMARY KEY (`playerId`)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8;
 
-DROP TABLE `team_player`;
-CREATE TABLE `team_player`
+DROP TABLE `fc_coupang`.`team_player`;
+CREATE TABLE `fc_coupang`.`team_player`
 (
     `teamPlayerId` BIGINT NOT NULL AUTO_INCREMENT,
     `matchId`      BIGINT NOT NULL,
@@ -26,8 +26,8 @@ CREATE TABLE `team_player`
     PRIMARY KEY (`teamPlayerId`)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8;
 
-DROP TABLE `match`;
-CREATE TABLE `match`
+DROP TABLE `fc_coupang`.`match`;
+CREATE TABLE `fc_coupang`.`match`
 (
     `matchId`    BIGINT NOT NULL AUTO_INCREMENT,
     `matchDate`  DATE        NOT NULL,
@@ -40,8 +40,8 @@ CREATE TABLE `match`
     PRIMARY KEY (`matchId`)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8;
 
-DROP TABLE `goal`;
-CREATE TABLE `goal`
+DROP TABLE `fc_coupang`.`goal`;
+CREATE TABLE `fc_coupang`.`goal`
 (
     `goalId`         BIGINT NOT NULL AUTO_INCREMENT,
     `matchId`        BIGINT NOT NULL,

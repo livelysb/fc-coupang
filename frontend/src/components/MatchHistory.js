@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button} from "@mui/material";
+import {Box, Button, Grid} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
@@ -10,24 +10,11 @@ import TableContainer from "@mui/material/TableContainer";
 import axios from "axios";
 import AlertDto from "./global-components/AlertDto";
 import CustomizedSnackbar from "./global-components/CustomizedSnackBar";
-
-
-class MatchDto {
-    matchId: number
-    matchDate: string
-    teamAScore: number
-    teamBScore: number
-
-    constructor(matchId: number, matchDate: string, teamAScore: number, teamBScore: number) {
-        this.matchId = matchId;
-        this.matchDate = matchDate;
-        this.teamAScore = teamAScore;
-        this.teamBScore = teamBScore;
-    }
-}
+import {useNavigate} from "react-router-dom";
 
 export default function MatchHistory() {
 
+    const navigate = useNavigate()
     const [matches, setMatches] = useState([]);
     const [alertDto, setAlertDto] = useState(null);
 
@@ -43,7 +30,13 @@ export default function MatchHistory() {
                 if (response.data.success) {
                     setMatches((prev => {
                         return [...prev, ...response.data.body.map((match) => {
-                            return new MatchDto(match.matchId, match.matchDate, match.teamAScore, match.teamBScore)
+                            return {
+                                'matchId': match.matchId,
+                                'matchDate': match.matchDate,
+                                'statusDescription': match.statusDescription,
+                                'teamAScore': match.teamAScore,
+                                'teamBScore': match.teamBScore
+                            }
                         })]
                     }))
                 } else {
@@ -53,14 +46,15 @@ export default function MatchHistory() {
     }
 
     return (
-        <Box sx={{mt: 2, mx: 3}}>
+        <Grid sx={{mt: 2, mx: 3}}>
             <h3>경기 결과</h3>
             <TableContainer component={Paper}>
                 <Table aria-label="a dense table">
                     <TableHead>
                         <TableRow>
                             <TableCell>번호</TableCell>
-                            <TableCell>날짜</TableCell>
+                            <TableCell>경기일</TableCell>
+                            <TableCell>상태</TableCell>
                             <TableCell>A</TableCell>
                             <TableCell>B</TableCell>
                         </TableRow>
@@ -70,9 +64,11 @@ export default function MatchHistory() {
                             matches ?
                                 matches.map((match) => {
                                     return (
-                                        <TableRow key={match.matchId}>
-                                            <TableCell>{match.matchId}</TableCell>
+                                        <TableRow key={match.matchId}
+                                                  onClick={() => navigate("/match-history-detail?matchId=" + match.matchId)}>
+                                            <TableCell><Box sx={{color: 'info.main'}}>{match.matchId}</Box></TableCell>
                                             <TableCell>{match.matchDate}</TableCell>
+                                            <TableCell>{match.statusDescription}</TableCell>
                                             <TableCell>{match.teamAScore}</TableCell>
                                             <TableCell>{match.teamBScore}</TableCell>
                                         </TableRow>
@@ -81,8 +77,11 @@ export default function MatchHistory() {
                         }
                         {
                             matches.length > 0 && matches.length % 5 === 0 ?
-                                <TableRow><TableCell align={'center'} colSpan={4}><Button variant="text"
-                                                                                          onClick={getRecentMatches}>더보기</Button></TableCell></TableRow>
+                                <TableRow>
+                                    <TableCell align={'center'} colSpan={4}>
+                                        <Button variant="text" onClick={getRecentMatches}>더보기</Button>
+                                    </TableCell>
+                                </TableRow>
                                 : null
                         }
                     </TableBody>
@@ -96,6 +95,6 @@ export default function MatchHistory() {
                         severity={alertDto.severity}
                     /> : null
             }
-        </Box>
+        </Grid>
     )
 }

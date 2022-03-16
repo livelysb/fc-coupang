@@ -15,4 +15,6 @@ data class MatchDto(
     val updatedAt: LocalDateTime,
     val teamPlayerDtoList: List<TeamPlayerDto>,
     val goalDtoList: List<GoalDto>
-)
+) {
+    val statusDescription get() = status.description
+}

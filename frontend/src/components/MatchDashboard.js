@@ -26,6 +26,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
+import DateFormatter from "./global-components/DateFormatter";
 
 const Item = styled(Paper)(({theme}) => ({
     ...theme.typography.body2,
@@ -36,16 +37,13 @@ const Item = styled(Paper)(({theme}) => ({
 
 export default function MatchDashboard() {
     const navigate = useNavigate()
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [match, setMatch] = useState(null)
+    const [searchParams, _] = useSearchParams()
     const [scoreRecord, setScoreRecord] = useState(false)
     const [goalPlayerId, setGoalPlayerId] = useState('')
     const [assistPlayerId, setAssistPlayerId] = useState('')
     const [clickablePlayer, setClickablePlayer] = useState([])
     const [alertDto, setAlertDto] = useState(null);
-    const [score, setScore] = useState({teamAScore: 0, teamBScore: 0})
-    const [teamA, setTeamA] = useState([])
-    const [teamB, setTeamB] = useState([])
-    const [goal, setGoal] = useState([])
     const [endMatchDialogOpen, setEndMatchDialogOpen] = useState(false)
     const [cancelMatchDialogOpen, setCancelMatchDialogOpen] = useState(false)
 
@@ -59,44 +57,78 @@ export default function MatchDashboard() {
             .get("/api/match?matchId=" + matchId)
             .then((response) => {
                 if (response.data.success) {
-                    let match = response.data.body;
-                    setScore({
-                        teamAScore: match.teamAScore,
-                        teamBScore: match.teamBScore,
-                    })
-                    setTeamA(
-                        match.teamPlayerDtoList.filter(teamPlayerDto => teamPlayerDto.teamA).map(teamPlayerDto => {
-                            return {
-                                playerId: teamPlayerDto.playerDto.playerId,
-                                name: teamPlayerDto.playerDto.name + " / " + teamPlayerDto.playerDto.nickname
-                            }
-                        })
-                    )
-                    setTeamB(
-                        match.teamPlayerDtoList.filter(teamPlayerDto => !teamPlayerDto.teamA).map(teamPlayerDto => {
-                            return {
-                                playerId: teamPlayerDto.playerDto.playerId,
-                                name: teamPlayerDto.playerDto.name + " / " + teamPlayerDto.playerDto.nickname
-                            }
-                        })
-                    )
+                    const res = response.data.body
+                    setMatch(res)
                     setClickablePlayer(
-                        match.teamPlayerDtoList.map(teamPlayerDto => {
-                            return teamPlayerDto.playerId
-                        })
-                    )
-                    setGoal(
-                        match.goalDtoList.map(goalDto => {
-                            return {
-                                goalPlayerId: goalDto.goalPlayerId,
-                                assistPlayerId: goalDto.assistPlayerId
-                            }
+                        res['teamPlayerDtoList'].map(player => {
+                            return player.playerId
                         })
                     )
                 } else {
                     setAlertDto(AlertDto.Error(response.data.message))
                 }
             })
+    }
+
+    async function handleGoalBtn() {
+        await axios
+            .post("/api/goal", {
+                matchId: searchParams.get("matchId"),
+                goalPlayerId: goalPlayerId,
+                assistPlayerId: assistPlayerId
+            })
+            .then((response) => {
+                if (response.data.success) {
+                    setScoreRecord(false)
+                    setGoalPlayerId('')
+                    setAssistPlayerId('')
+                    setClickablePlayer(match['teamPlayerDtoList'].map(t => t.playerId))
+                    getMatch(searchParams.get("matchId"))
+
+                } else {
+                    setAlertDto(AlertDto.Error(response.data.message))
+                }
+            })
+    }
+
+    async function handleEndMatchBtn() {
+        await axios
+            .post("/api/match/end?matchId=" + searchParams.get("matchId"))
+            .then((response) => {
+                if (response.data.success) {
+                    navigate("/match-record", {replace: true})
+                } else {
+                    setAlertDto(AlertDto.Error(response.data.message))
+                }
+            })
+    }
+
+    async function handleCancelMatchBtn() {
+        await axios
+            .post("/api/match/cancel?matchId=" + searchParams.get("matchId"))
+            .then((response) => {
+                if (response.data.success) {
+                    navigate("/match-record", {replace: true})
+                } else {
+                    setAlertDto(AlertDto.Error(response.data.message))
+                }
+            })
+    }
+
+    function getPlayerFullName(playerDto) {
+        return playerDto['name'] + " / " + playerDto['nickname']
+    }
+
+    function getTeamAPlayers() {
+        return match['teamPlayerDtoList'].filter((player) => {
+            return player['teamA']
+        })
+    }
+
+    function getTeamBPlayers() {
+        return match['teamPlayerDtoList'].filter((player) => {
+            return !player['teamA']
+        })
     }
 
     function playerClick(e) {
@@ -112,153 +144,111 @@ export default function MatchDashboard() {
 
     function goalPlayerOnChange(e) {
         let goalPlayerId = parseInt(e.target.value);
-        let teamAPlayerId = teamA.map(t => t.playerId);
+        let teamAPlayerIds = getTeamAPlayers().map(t => t.playerId);
         setGoalPlayerId(goalPlayerId)
-        if (teamAPlayerId.includes(goalPlayerId)) {
-            setClickablePlayer(teamAPlayerId)
+        if (teamAPlayerIds.includes(goalPlayerId)) {
+            setClickablePlayer(teamAPlayerIds)
         } else {
-            setClickablePlayer(teamB.map(t => t.playerId))
+            setClickablePlayer(getTeamBPlayers().map(t => t.playerId))
         }
-    }
-
-    async function handleGoalBtn() {
-        await axios
-            .post("/api/goal", {
-                matchId: searchParams.get("matchId"),
-                goalPlayerId: goalPlayerId,
-                assistPlayerId: assistPlayerId
-            })
-            .then((response) => {
-                if (response.data.success) {
-                    if (teamA.findIndex(value => value.playerId === goalPlayerId) >= 0) {
-                        score.teamAScore++
-                    } else {
-                        score.teamBScore++
-                    }
-                    setGoal((prev => [...prev,
-                        {
-                            goalPlayerId: goalPlayerId,
-                            assistPlayerId: assistPlayerId
-                        }
-                    ]))
-                    setGoalPlayerId('')
-                    setAssistPlayerId('')
-                    setClickablePlayer(teamA.concat(teamB).map(t => t.playerId))
-                    setScoreRecord(false)
-                } else {
-                    setAlertDto(AlertDto.Error(response.data.message))
-                }
-            })
-    }
-
-    async function handleEndMatchBtn() {
-        await axios
-            .post("/api/match/end?matchId=" + searchParams.get("matchId"))
-            .then((response) => {
-                if (response.data.success) {
-                    navigate("/match", {replace: true})
-                } else {
-                    setAlertDto(AlertDto.Error(response.data.message))
-                }
-            })
-    }
-
-    async function handleCancelMatchBtn() {
-        await axios
-            .post( "/api/match/cancel?matchId=" + searchParams.get("matchId"))
-            .then((response) => {
-                if (response.data.success) {
-                    navigate("/match", {replace: true})
-                } else {
-                    setAlertDto(AlertDto.Error(response.data.message))
-                }
-            })
     }
 
 
     return (
         <Grid sx={{mt: 2, mx: 3, mb: 3}}>
             <h3>경기 기록 <small>- 경기 현황</small></h3>
-            <div align={"right"}><h4>경기번호 : {searchParams.get("matchId")}</h4></div>
-            <Grid container spacing={2}>
-                <Grid xs={6} item justifyContent="center">
-                    <Item>
-                        <h4>Team A<Box style={{"color":"red"}}>{score.teamAScore}</Box></h4>
-                        {
-                            teamA ?
-                                teamA.map((player) => {
-                                    return (
-                                        <Box mt={1} px={1} key={player.playerId}>
-                                            <Button variant={"outlined"}
-                                                    value={player.playerId}
-                                                    onClick={playerClick}
-                                                    disabled={!clickablePlayer.includes(player.playerId)}
-                                                    fullWidth
-                                            >{player.name}
-                                            </Button>
-                                        </Box>
-                                    )
-                                }) : null
-                        }
-                    </Item>
-                </Grid>
-                <Grid xs={6} item justifyContent="center">
-                    <Item>
-                        <h4>Team B<Box style={{"color":"red"}}>{score.teamBScore}</Box></h4>
-                        {
-                            teamB ?
-                                teamB.map((player) => {
-                                    return (
-                                        <Box mt={1} px={1} key={player.playerId}>
-                                            <Button variant={"outlined"}
-                                                    value={player.playerId}
-                                                    onClick={playerClick}
-                                                    disabled={!clickablePlayer.includes(player.playerId)}
-                                                    fullWidth
-                                            >{player.name}</Button>
-                                        </Box>
-                                    )
-                                }) : null
-                        }
-                    </Item>
-                </Grid>
+            <Grid sx={{mb: 1}}>
+                <p align={"right"}>
+                    <strong>경기번호</strong>: {searchParams.get("matchId")}<br/>
+                    <strong>시작시간</strong>: {match ? DateFormatter(match['createdAt']) : ''}
+                </p>
             </Grid>
             {
-                score.teamAScore + score.teamBScore > 0 ?
+                match ?
+                    <Grid container spacing={2}>
+                        <Grid xs={6} item justifyContent="center">
+                            <Item>
+                                <h4>Team A<Box style={{"color": "red"}}>{match['teamAScore']}</Box></h4>
+                                {
+                                    getTeamAPlayers().map((player) => {
+                                        return (
+                                            <Box mt={1} px={1} key={player['playerId']}>
+                                                <Button variant={"outlined"}
+                                                        value={player['playerId']}
+                                                        onClick={playerClick}
+                                                        disabled={!clickablePlayer.includes(player['playerId'])}
+                                                        fullWidth
+                                                >{getPlayerFullName(player['playerDto']).substr(0, 10)}
+                                                </Button>
+                                            </Box>
+                                        )
+                                    })
+                                }
+                            </Item>
+                        </Grid>
+                        <Grid xs={6} item justifyContent="center">
+                            <Item>
+                                <h4>Team B<Box style={{"color": "red"}}>{match['teamBScore']}</Box></h4>
+                                {
+                                    getTeamBPlayers().map((player) => {
+                                        return (
+                                            <Box mt={1} px={1} key={player['playerId']}>
+                                                <Button variant={"outlined"}
+                                                        value={player['playerId']}
+                                                        onClick={playerClick}
+                                                        disabled={!clickablePlayer.includes(player['playerId'])}
+                                                        fullWidth
+                                                >{getPlayerFullName(player['playerDto']).substr(0, 10)}
+                                                </Button>
+                                            </Box>
+                                        )
+                                    })
+                                }
+                            </Item>
+                        </Grid>
+                    </Grid>
+                    : null
+            }
+            {
+                match && match['goalDtoList'].length > 0 ?
                     <Box sx={{mt: 3}}>
                         <h4>득점 기록</h4>
-                            <Box sx={{px: 1, py: 1}}>
-                                <TableContainer component={Paper}>
-                                    <Table size="small" aria-label="a dense table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>팀</TableCell>
-                                                <TableCell>득점 선수</TableCell>
-                                                <TableCell>도움 선수</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {
-                                                goal.map(goalDto => (
-                                                        <TableRow key={Math.random()}
-                                                                  sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                                            <TableCell component="th" scope="row">
-                                                                {teamA.map(t => t.playerId).includes(goalDto.goalPlayerId) ? 'A' : 'B'}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {teamA.concat(teamB).find(teamPlayer => goalDto.goalPlayerId === teamPlayer.playerId)?.name}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {teamA.concat(teamB).find(teamPlayer => goalDto.assistPlayerId === teamPlayer.playerId)?.name}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )
+                        <Box sx={{px: 1, py: 1}}>
+                            <TableContainer component={Paper}>
+                                <Table size="small" aria-label="a dense table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>팀</TableCell>
+                                            <TableCell>득점 선수</TableCell>
+                                            <TableCell>도움 선수</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {
+                                            match['goalDtoList'].map(goal => (
+                                                    <TableRow key={Math.random()}
+                                                              sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                                        <TableCell component="th" scope="row">
+                                                            {getTeamAPlayers().map(player => player.playerId).includes(goal['goalPlayerId']) ? 'A' : 'B'}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {getPlayerFullName(match['teamPlayerDtoList'].find(player => goal['goalPlayerId'] === player.playerId)['playerDto'])}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                goal.assistPlayerId ?
+                                                                    getPlayerFullName(match['teamPlayerDtoList'].find(player => goal['assistPlayerId'] === player.playerId)['playerDto'])
+                                                                    : null
+                                                            }
+                                                        </TableCell>
+                                                    </TableRow>
                                                 )
-                                            }
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Box>
+                                            )
+                                        }
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
                     </Box> : null
             }
 
@@ -280,15 +270,16 @@ export default function MatchDashboard() {
 
                                 {
                                     clickablePlayer.map((value) => {
-                                        let player = teamA.concat(teamB).find(t => value === t.playerId);
+                                        console.log(value)
+                                        let player = match['teamPlayerDtoList'].find(t => value === t.playerId);
+                                        console.log(player)
                                         return (
-                                            <MenuItem key={player.playerId}
-                                                      value={player.playerId}>{player.name}</MenuItem>
+                                            <MenuItem key={player['playerId']}
+                                                      value={player['playerId']}>{getPlayerFullName(player['playerDto'])}</MenuItem>
                                         );
                                     })
                                 }
                             </Select>
-
                         </FormControl>
                         <FormControl variant="standard" sx={{m: 1, minWidth: 120}}>
                             <InputLabel id="assist-player-label">도움 선수</InputLabel>
@@ -303,10 +294,10 @@ export default function MatchDashboard() {
                                 {
                                     clickablePlayer
                                         .map((value) => {
-                                            let player = teamA.concat(teamB).find(t => value === t.playerId);
+                                            let player = match['teamPlayerDtoList'].find(t => value === t.playerId);
                                             return (
                                                 <MenuItem key={player.playerId}
-                                                          value={player.playerId}>{player.name}</MenuItem>
+                                                          value={player.playerId}>{getPlayerFullName(player['playerDto'])}</MenuItem>
                                             );
                                         })
                                 }
@@ -320,7 +311,7 @@ export default function MatchDashboard() {
                                             setScoreRecord(false);
                                             setAssistPlayerId('');
                                             setGoalPlayerId('');
-                                            setClickablePlayer(teamA.concat(teamB).map(t => t.playerId))
+                                            setClickablePlayer(match['teamPlayerDtoList'].map(t => t.playerId))
                                         }}
                                 >취소</Button>
                             </Stack>

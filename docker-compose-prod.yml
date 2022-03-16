@@ -17,3 +17,4 @@ services:
       - "PROFILE=production"
       - "DB_USER_NAME=${DB_USER_NAME}"
       - "DB_USER_PASSWORD=${DB_USER_PASSWORD}"
+      - "TZ=Asia/Seoul"

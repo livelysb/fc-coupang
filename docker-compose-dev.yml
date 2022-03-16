@@ -9,6 +9,7 @@ services:
       - "MYSQL_USER=${DB_USER_NAME}"
       - "MYSQL_PASSWORD=${DB_USER_PASSWORD}"
       - "MYSQL_DATABASE=fc_coupang"
+      - "TZ=Asia/Seoul"
   nginx:
     build:
       dockerfile: Dockerfile
@@ -26,6 +27,7 @@ services:
   app:
     build:
       dockerfile: Dockerfile
+      context: .
     environment:
       - "PROFILE=develop"
       - "DB_USER_NAME=${DB_USER_NAME}"

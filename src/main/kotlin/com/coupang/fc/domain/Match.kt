@@ -40,13 +40,13 @@ class Match(request: MatchCreateRequest) {
 
     init {
         val teamAPlayerCnt = teamPlayerList.filter { teamPlayer -> teamPlayer.teamAGet }.size
-        if(teamAPlayerCnt == 0 || teamAPlayerCnt == teamPlayerList.size) {
+        if (teamAPlayerCnt == 0 || teamAPlayerCnt == teamPlayerList.size) {
             throw ExpectedCaseException("팀의 선수는 1명 이상이어야 합니다.")
         }
     }
 
-    enum class Status {
-        IN_PROGRESS, ENDED
+    enum class Status(val description: String) {
+        IN_PROGRESS("경기중"), ENDED("경기종료")
     }
 
 
