@@ -270,9 +270,7 @@ export default function MatchDashboard() {
 
                                 {
                                     clickablePlayer.map((value) => {
-                                        console.log(value)
                                         let player = match['teamPlayerDtoList'].find(t => value === t.playerId);
-                                        console.log(player)
                                         return (
                                             <MenuItem key={player['playerId']}
                                                       value={player['playerId']}>{getPlayerFullName(player['playerDto'])}</MenuItem>

@@ -25,7 +25,6 @@ export default function PlayerHistory() {
             .get("/api/all-players")
             .then((response) => {
                 if (response.data.success) {
-                    console.log(response.data.body)
                     setPlayers(response.data.body)
                 } else {
                     setAlertDto(AlertDto.Error(response.data.message))
