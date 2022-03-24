@@ -39,7 +39,7 @@ class PlayerService(
             Gson().fromJson(it, object : TypeToken<ArrayList<Long>>() {}.type)
         } ?: emptyList()
 
-        return playerRepository.findAllById(todayPlayersId).map{ it.toDto() }
+        return playerRepository.findAllById(todayPlayersId).map{ it.toDto() }.sortedBy { it.name }
     }
 
 
