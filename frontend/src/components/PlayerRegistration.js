@@ -57,7 +57,6 @@ export default function PlayerRegistration() {
                         onChange={onNicknameChange}
                         value={nickname}
                         label={"닉네임"}
-                        required
                         variant="standard"
                     />
                 </Box>
