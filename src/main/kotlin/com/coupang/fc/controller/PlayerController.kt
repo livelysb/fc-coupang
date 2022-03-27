@@ -4,6 +4,7 @@ import com.coupang.fc.common.ApiResponse
 import com.coupang.fc.data.PlayerCreateRequest
 import com.coupang.fc.data.PlayerDto
 import com.coupang.fc.application.PlayerService
+import com.coupang.fc.data.TodayPlayerDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,11 +19,11 @@ class PlayerController(
     fun getAllPlayers(): ApiResponse<List<PlayerDto>> = ApiResponse.run { playerService.getAllPlayers() }
 
     @PostMapping("/today-players")
-    fun putTodayPlayers(@RequestBody playerIdList: List<Long>) =
-        ApiResponse.run { playerService.putTodayPlayers(playerIdList) }
+    fun putTodayPlayers(@RequestBody todayPlayerList: List<TodayPlayerDto>) =
+        ApiResponse.run { playerService.putTodayPlayers(todayPlayerList) }
 
     @GetMapping("/today-players")
-    fun getTodayPlayers(): ApiResponse<List<PlayerDto>> = ApiResponse.run { playerService.getTodayPlayers() }
+    fun getTodayPlayers(): ApiResponse<List<TodayPlayerDto>> = ApiResponse.run { playerService.getTodayPlayers() }
 
     @PostMapping("/player")
     fun createPlayer(@RequestBody request: PlayerCreateRequest): ApiResponse<Unit> =

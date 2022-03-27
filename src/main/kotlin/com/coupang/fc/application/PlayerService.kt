@@ -2,7 +2,7 @@ package com.coupang.fc.application
 
 import com.coupang.fc.common.ExpectedCaseException
 import com.coupang.fc.data.PlayerCreateRequest
-import com.coupang.fc.data.PlayerDto
+import com.coupang.fc.data.TodayPlayerDto
 import com.coupang.fc.domain.Player
 import com.coupang.fc.domain.PlayerRepository
 import com.google.gson.Gson
@@ -30,16 +30,16 @@ class PlayerService(
         playerRepository.save(Player(request))
     }
 
-    fun putTodayPlayers(playerIdList: List<Long>) {
+    fun putTodayPlayers(playerIdList: List<TodayPlayerDto>) {
         stringRedisTemplate.opsForValue().set(TODAY_PLAYERS, Gson().toJson(playerIdList), 1, TimeUnit.DAYS)
     }
 
-    fun getTodayPlayers(): List<PlayerDto> {
-        val todayPlayersId: List<Long> = stringRedisTemplate.opsForValue().get(TODAY_PLAYERS)?.let {
-            Gson().fromJson(it, object : TypeToken<ArrayList<Long>>() {}.type)
+    fun getTodayPlayers(): List<TodayPlayerDto> {
+        val todayPlayers: List<TodayPlayerDto> = stringRedisTemplate.opsForValue().get(TODAY_PLAYERS)?.let {
+            Gson().fromJson(it, object : TypeToken<ArrayList<TodayPlayerDto>>() {}.type)
         } ?: emptyList()
 
-        return playerRepository.findAllById(todayPlayersId).map{ it.toDto() }.sortedBy { it.name }
+        return todayPlayers.sortedWith(compareBy({ it.defaultTeamNumber }, { it.name }))
     }
 
 

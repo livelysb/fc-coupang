@@ -17,11 +17,13 @@ class PlayerDto {
     playerId: number
     name: string
     team: string
+    defaultTeamNumber: number
 
-    constructor(playerId, name, team) {
+    constructor(playerId, name, team, defaultTeamNumber) {
         this.playerId = playerId
         this.name = name
         this.team = team
+        this.defaultTeamNumber = defaultTeamNumber
     }
 }
 
@@ -38,7 +40,7 @@ export default function TeamBuilding() {
             .get("/api/today-players")
             .then((response) => {
                 if (response.data.success) {
-                    const playerList = response.data.body.map((player) => new PlayerDto(player.playerId, player.name + " / " + player.nickname, ''))
+                    const playerList = response.data.body.map((player) => new PlayerDto(player.playerId, player.name + " / " + player.nickname, '', player.defaultTeamNumber))
                     playerList.forEach(player =>
                         setPlayers((prev) => new Map([...prev, [player.playerId, player]])))
 
@@ -98,6 +100,7 @@ export default function TeamBuilding() {
                 <Table size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
+                            <TableCell>팀</TableCell>
                             <TableCell>이름 / 닉네임</TableCell>
                             <TableCell align={"center"}>A
                                 ({Array.from(players).filter(([, value]) => value.team === 'a').length})</TableCell>
@@ -112,6 +115,9 @@ export default function TeamBuilding() {
                                     key={key}
                                     sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                 >
+                                    <TableCell component="th" scope="row">
+                                        {value.defaultTeamNumber}
+                                    </TableCell>
                                     <TableCell component="th" scope="row">
                                         {value.name}
                                     </TableCell>
