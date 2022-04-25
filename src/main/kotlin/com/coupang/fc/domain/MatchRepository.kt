@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface MatchRepository : JpaRepository<Match, Long> {
-    fun findTop5ByMatchIdLessThanOrderByMatchIdDesc(lastMatchId: Long): List<Match>
+    fun findTop20ByMatchIdLessThanOrderByMatchIdDesc(lastMatchId: Long): List<Match>
 }

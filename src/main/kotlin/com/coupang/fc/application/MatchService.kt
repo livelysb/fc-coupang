@@ -44,6 +44,6 @@ class MatchService(
 
     @Transactional(readOnly = true)
     fun getRecentMatches(lastMatchId: Long = Long.MAX_VALUE) =
-        matchRepository.findTop5ByMatchIdLessThanOrderByMatchIdDesc(lastMatchId).map { it.toDto() }
+        matchRepository.findTop20ByMatchIdLessThanOrderByMatchIdDesc(lastMatchId).map { it.toDto() }
 
 }
