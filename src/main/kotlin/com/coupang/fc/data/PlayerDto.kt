@@ -12,7 +12,9 @@ data class PlayerDto(
     val assistCnt: Int,
     val matchCnt: Int,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+
+    val winningPoints: Double
 )
 
 

@@ -5,6 +5,7 @@ import com.coupang.fc.data.PlayerDto
 import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import javax.persistence.*
+import kotlin.math.round
 
 @Entity
 @Table(name = "player")
@@ -53,5 +54,8 @@ class Player(
             matchCnt = matchCnt,
             createdAt = createdAt,
             updatedAt = updatedAt,
+            winningPoints = if (matchCnt != 0) {
+                round(((winCnt + (matchCnt - winCnt - loseCnt) * 0.5) / matchCnt) * 1000) / 100
+            } else 0.00
         )
 }

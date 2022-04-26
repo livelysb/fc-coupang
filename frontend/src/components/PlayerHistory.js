@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Grid} from "@mui/material";
+import {Button, ButtonGroup, Grid, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -15,6 +15,7 @@ export default function PlayerHistory() {
 
     const [players, setPlayers] = useState([]);
     const [alertDto, setAlertDto] = useState(null);
+    const [alignment, setAlignment] = useState('name');
 
     useEffect(() => {
         getAllPlayers()
@@ -36,17 +37,31 @@ export default function PlayerHistory() {
         return playerDto['name'] + " / " + playerDto['nickname']
     }
 
+    function changeOrder(event, newAlignment) {
+        setAlignment(newAlignment);
+        if (newAlignment === 'winningPoints') {
+            setPlayers([...players].sort((a, b) => b['winningPoints'] - a['winningPoints']))
+        } else {
+            setPlayers([...players].sort((a, b) => getPlayerFullName(a) > getPlayerFullName(b) ? 1 : -1))
+        }
+    }
+
     return (
         <Grid sx={{mt: 2, mx: 3}}>
             <h3>선수 이력</h3>
+            <p align={"right"}>
+                <ToggleButtonGroup color="primary" size={"small"} exclusive value={alignment} onChange={changeOrder}>
+                    <ToggleButton value={"name"}>이름순</ToggleButton>
+                    <ToggleButton value={"winningPoints"}>승점순</ToggleButton>
+                </ToggleButtonGroup>
+            </p>
             <TableContainer component={Paper}>
                 <Table aria-label="a dense table">
                     <TableHead>
                         <TableRow>
                             <TableCell>이름</TableCell>
-                            <TableCell>승/무/패</TableCell>
-                            <TableCell>득점</TableCell>
-                            <TableCell>도움</TableCell>
+                            <TableCell align={"center"}>승 / 무 / 패<br/>득점 / 도움</TableCell>
+                            <TableCell align={"center"}>승점</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -56,9 +71,10 @@ export default function PlayerHistory() {
                                     return (
                                         <TableRow key={player['playerId']}>
                                             <TableCell>{getPlayerFullName(player)}</TableCell>
-                                            <TableCell>{player['winCnt'] + " / " + (player['matchCnt'] - player['winCnt'] - player['loseCnt']) + " / " + player['loseCnt']}</TableCell>
-                                            <TableCell>{player['goalCnt']}</TableCell>
-                                            <TableCell>{player['assistCnt']}</TableCell>
+                                            <TableCell
+                                                align={"center"}>{player['winCnt'] + " / " + (player['matchCnt'] - player['winCnt'] - player['loseCnt']) + " / " + player['loseCnt']}
+                                                <br/>{player['goalCnt'] + " / " + player['assistCnt']}</TableCell>
+                                            <TableCell align={"center"}>{player['winningPoints']}</TableCell>
                                         </TableRow>
                                     )
                                 }) : null

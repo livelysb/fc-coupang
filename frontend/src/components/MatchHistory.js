@@ -33,6 +33,7 @@ export default function MatchHistory() {
                             return {
                                 'matchId': match.matchId,
                                 'matchDate': match.matchDate,
+                                'status': match.status,
                                 'statusDescription': match.statusDescription,
                                 'teamAScore': match.teamAScore,
                                 'teamBScore': match.teamBScore
@@ -65,7 +66,14 @@ export default function MatchHistory() {
                                 matches.map((match) => {
                                     return (
                                         <TableRow key={match.matchId}
-                                                  onClick={() => navigate("/match-history-detail?matchId=" + match.matchId)}>
+                                                  onClick={() => {
+                                                      if(match.status === 'IN_PROGRESS') {
+                                                          navigate("/dashboard?matchId=" + match.matchId)
+                                                      } else {
+                                                          navigate("/match-history-detail?matchId=" + match.matchId);
+                                                      }
+
+                                                  }}>
                                             <TableCell><Box sx={{color: 'info.main'}}>{match.matchId}</Box></TableCell>
                                             <TableCell>{match.matchDate}</TableCell>
                                             <TableCell>{match.statusDescription}</TableCell>

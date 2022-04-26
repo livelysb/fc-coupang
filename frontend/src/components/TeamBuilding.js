@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid} from "@mui/material";
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid
+} from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,12 +28,27 @@ class PlayerDto {
     name: string
     team: string
     defaultTeamNumber: number
+    defaultTeamColor: string
 
     constructor(playerId, name, team, defaultTeamNumber) {
         this.playerId = playerId
         this.name = name
         this.team = team
         this.defaultTeamNumber = defaultTeamNumber
+        switch (defaultTeamNumber) {
+            case 1:
+                this.defaultTeamColor = "error"
+                break;
+            case 2:
+                this.defaultTeamColor = "success"
+                break;
+            case 3:
+                this.defaultTeamColor = "info"
+                break;
+            case 4:
+                this.defaultTeamColor = "warning"
+                break;
+        }
     }
 }
 
@@ -111,12 +136,13 @@ export default function TeamBuilding() {
                     <TableBody>
                         {
                             Array.from(players).map(([key, value]) => (
+
                                 <TableRow
                                     key={key}
                                     sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                 >
                                     <TableCell component="th" scope="row">
-                                        {value.defaultTeamNumber}
+                                        <Chip label={value.defaultTeamNumber} color={value.defaultTeamColor} size={"small"} />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {value.name}

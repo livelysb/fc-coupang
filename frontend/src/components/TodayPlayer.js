@@ -119,6 +119,8 @@ export default function TodayPlayer() {
                                 ({Array.from(todayPlayers).filter(([, todayPlayer]) => todayPlayer['defaultTeamNumber'] === 2).length})</TableCell>
                             <TableCell align={"center"}>3
                                 ({Array.from(todayPlayers).filter(([, todayPlayer]) => todayPlayer['defaultTeamNumber'] === 3).length})</TableCell>
+                            <TableCell align={"center"}>4
+                                ({Array.from(todayPlayers).filter(([, todayPlayer]) => todayPlayer['defaultTeamNumber'] === 4).length})</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -159,6 +161,16 @@ export default function TodayPlayer() {
                                                 checked={(todayPlayer ? todayPlayer['defaultTeamNumber'] : undefined) === 3}
                                                 onClick={handleFormat}
                                                 value="3"
+                                                name="radio-buttons"
+                                                inputProps={{'player-id': player['playerId']}}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Radio
+                                                size={"small"}
+                                                checked={(todayPlayer ? todayPlayer['defaultTeamNumber'] : undefined) === 4}
+                                                onClick={handleFormat}
+                                                value="4"
                                                 name="radio-buttons"
                                                 inputProps={{'player-id': player['playerId']}}
                                             />

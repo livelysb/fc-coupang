@@ -55,7 +55,7 @@ export default function MenuAppBar() {
                         >
                             <MenuItem component={Link} to="/" onClick={handleClose}>오늘의 선수명단</MenuItem>
                             <MenuItem component={Link} to="/match-record" onClick={handleClose}>경기 기록</MenuItem>
-                            <MenuItem component={Link} to="/match-history" onClick={handleClose}>경기 결과</MenuItem>
+                            <MenuItem component={Link} to="/match-history" onClick={handleClose}>경기 목록</MenuItem>
                             <MenuItem component={Link} to="/player-history" onClick={handleClose}>선수 이력</MenuItem>
                             <MenuItem component={Link} to="/player-register" onClick={handleClose}>선수 등록</MenuItem>
 
